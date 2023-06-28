@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consulta de Criptomoedas</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Consulta de Criptomoedas</h1>
+
+    <form class="search-form" action="/crypto-currencies" method="GET">
+      <input class="search-input" type="text" name="search" placeholder="Buscar criptomoeda">
+      <button class="search-button" type="submit">Buscar</button>
+    </form>
+
+    <table>
+      <tr>
+        <th>Nome</th>
+        <th>Símbolo</th>
+        <th>Preço</th>
+        <th>Capitalização de Mercado</th>
+        <th>Volume (24h)</th>
+        <th>Variação (24h)</th>
+      </tr>
+      <% cryptoList.forEach(crypto => { %>
+      <tr>
+        <td><%= crypto.name %></td>
+        <td><%= crypto.symbol %></td>
+        <td><%= crypto.price %></td>
+        <td><%= crypto.marketCap %></td>
+        <td><%= crypto.volume %></td>
+        <td><%= crypto.change %></td>
+      </tr>
+      <% }) %>
+    </table>
+  </div>
+ <!-- Importe a biblioteca Socket.io -->
+ <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+
+
+<script>
+  // Conecte-se ao servidor WebSocket
+  const socket = io();
+
+  // Ouça o evento 'cryptoUpdate' para receber as atualizações das criptomoedas
+  socket.on('cryptoUpdate', cryptoList => {
+    // Atualize os valores na página
+    updateCryptoValues(cryptoList);
+  });
+
+  // Função para atualizar os valores das criptomoedas na página
+  function updateCryptoValues(cryptoList) {
+    // Atualize os valores no HTML
+    cryptoList.forEach(crypto => {
+      const symbol = crypto.symbol;
+      const price = crypto.price;
+      const change = crypto.change;
+
+      // Encontre o elemento HTML correspondente ao valor da criptomoeda
+      const priceElement = document.getElementById(`${symbol}-price`);
+
+      // Atualize o valor
+      priceElement.textContent = price.toFixed(2);
+
+      // Verifique se houve uma mudança positiva ou negativa
+      if (change > 0) {
+        // Atualize a cor do texto para verde e adicione a classe 'blink' para piscar
+        priceElement.style.color = 'green';
+        priceElement.classList.add('blink');
+      } else if (change < 0) {
+        // Atualize a cor do texto para vermelho e adicione a classe 'blink' para piscar
+        priceElement.style.color = 'red';
+        priceElement.classList.add('blink');
+      } else {
+        // Mantenha a cor original e remova a classe 'blink'
+        priceElement.style.color = '';
+        priceElement.classList.remove('blink');
+      }
+    });
+  }
+</script>
+
+  </body>
+  
+  </html>
+  

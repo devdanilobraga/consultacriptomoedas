@@ -56,7 +56,7 @@ setInterval(async () => {
   }
 }, 1000);
 
-app.get('/crypto-currencies', async (req, res) => {
+app.get('/', async (req, res) => {
   try {
     const cryptoList = await getCryptoList();
     const searchQuery = req.query.search;
